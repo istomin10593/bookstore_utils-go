@@ -51,7 +51,7 @@ func TestNewNotFoundError(t *testing.T) {
 }
 
 func TestNewError(t *testing.T) {
-	err := NewError("test error new")
+	err := NewRestError("test error new")
 
 	assert.NotNil(t, err)
 	assert.EqualValues(t, "test error new", err.Error())
