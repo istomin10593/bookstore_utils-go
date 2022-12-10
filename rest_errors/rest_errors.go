@@ -1,58 +1,75 @@
 package rest_errors
 
 import (
-	"errors"
+	"fmt"
 	"net/http"
 )
 
-type RestErr struct {
-	Message string        `json:"message"`
-	Status  int           `json:"status"`
-	Error   string        `json:"error"`
-	Causes  []interface{} `json:"cause"`
+type RestErr interface {
+	Message() string
+	Status() int
+	Error() string
+	Causes() []interface{}
 }
 
-func NewRestError(msg string) error {
-	return errors.New(msg)
+type restErr struct {
+	ErrMessage string        `json:"message"`
+	ErrStatus  int           `json:"status"`
+	ErrError   string        `json:"error"`
+	ErrCauses  []interface{} `json:"causes"`
 }
 
-func NewBadRequestError(message string, err error) *RestErr {
-	result := &RestErr{
-		Message: message,
-		Status:  http.StatusBadRequest,
-		Error:   "bad_request",
+func (e restErr) Message() string {
+	return e.ErrMessage
+}
+
+func (e restErr) Status() int {
+	return e.ErrStatus
+}
+
+func (e restErr) Causes() []interface{} {
+	return e.ErrCauses
+}
+
+func (e restErr) Error() string {
+	return fmt.Sprintf("message: %s - status: %d - error: %s - causes: %v",
+		e.ErrMessage, e.ErrStatus, e.ErrError, e.ErrCauses)
+}
+
+func NewRestError(message string, status int, err string, causes []interface{}) RestErr {
+	return restErr{
+		ErrMessage: message,
+		ErrStatus:  status,
+		ErrError:   err,
+		ErrCauses:  causes,
+	}
+}
+
+func NewBadRequestError(message string, err error) RestErr {
+	return restErr{
+		ErrMessage: message,
+		ErrStatus:  http.StatusBadRequest,
+		ErrError:   "bad_request",
+	}
+}
+
+func NewNotFoundError(message string, err error) RestErr {
+	return restErr{
+		ErrMessage: message,
+		ErrStatus:  http.StatusNotFound,
+		ErrError:   "not_found",
+	}
+}
+
+func NewInternalServerError(message string, err error) RestErr {
+	result := restErr{
+		ErrMessage: message,
+		ErrStatus:  http.StatusInternalServerError,
+		ErrError:   "internal_server error",
 	}
 
 	if err != nil {
-		result.Causes = append(result.Causes, err.Error())
-	}
-
-	return result
-}
-
-func NewNotFoundError(message string, err error) *RestErr {
-	result := &RestErr{
-		Message: message,
-		Status:  http.StatusNotFound,
-		Error:   "not_found",
-	}
-
-	if err != nil {
-		result.Causes = append(result.Causes, err.Error())
-	}
-
-	return result
-}
-
-func NewInternalServerError(message string, err error) *RestErr {
-	result := &RestErr{
-		Message: message,
-		Status:  http.StatusInternalServerError,
-		Error:   "internal_server error",
-	}
-
-	if err != nil {
-		result.Causes = append(result.Causes, err.Error())
+		result.ErrCauses = append(result.ErrCauses, err.Error())
 	}
 
 	return result
