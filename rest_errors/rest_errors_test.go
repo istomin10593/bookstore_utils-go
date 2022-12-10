@@ -23,7 +23,7 @@ func TestNewInternalServerError(t *testing.T) {
 }
 
 func TestNewBadRequestError(t *testing.T) {
-	err := NewBadRequestError("test error BRE", errors.New("invalid err"))
+	err := NewBadRequestError("test error BRE")
 
 	assert.NotNil(t, err)
 
@@ -36,7 +36,7 @@ func TestNewBadRequestError(t *testing.T) {
 }
 
 func TestNewNotFoundError(t *testing.T) {
-	err := NewBadRequestError("test error NFE", errors.New("not found err"))
+	err := NewBadRequestError("test error NFE")
 
 	assert.NotNil(t, err)
 

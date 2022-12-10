@@ -45,7 +45,7 @@ func NewRestError(message string, status int, err string, causes []interface{}) 
 	}
 }
 
-func NewBadRequestError(message string, err error) RestErr {
+func NewBadRequestError(message string) RestErr {
 	return restErr{
 		ErrMessage: message,
 		ErrStatus:  http.StatusBadRequest,
@@ -53,7 +53,7 @@ func NewBadRequestError(message string, err error) RestErr {
 	}
 }
 
-func NewNotFoundError(message string, err error) RestErr {
+func NewNotFoundError(message string) RestErr {
 	return restErr{
 		ErrMessage: message,
 		ErrStatus:  http.StatusNotFound,
